@@ -11,22 +11,11 @@ def main():
 
     client = groq.Client(api_key=API_KEY)
 
-    
-    models = client.models.list()
-
-    for m in models:
-        try:
-            print(m.name)   # object attribute
-        except Exception:
-            print(m)   
-
-
-
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
     base_dir = os.path.dirname(os.path.dirname(__file__))
-    css_path = os.path.join(base_dir, "assets", "darkpro.css")
+    css_path = os.path.join(base_dir, "assets", "dark_theme.css")
     with open(css_path, "r", encoding="utf-8") as f:
         app.setStyleSheet(f.read())
 

@@ -4,7 +4,9 @@ from PyQt6.QtWidgets import (
     QStatusBar, QTextEdit, QVBoxLayout, QHBoxLayout
 )
 from PyQt6.QtGui import QIcon
-
+from PyQt6.QtWidgets import QFrame
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 from app.utils import extract_video_id
 from app.youtube import fetch_transcript
 from app.summarizer import summarize_transcript
@@ -15,10 +17,9 @@ class AppWindow(QWidget):
         super().__init__()
         self.client = client
 
-        self.setWindowTitle("Diana's YouTube Transcript Downloader")
-        self.setWindowIcon(QIcon(os.path.join("assets", "transcription.png")))
+        self.setWindowTitle("YouTube transcript & summary tool")
+        self.setWindowIcon(QIcon(os.path.join("assets", "Icon_window.png")))
         self.resize(800, 600)
-        self.setStyleSheet("font-size: 14px;")
 
         self.layout = {}
         self.layout["main"] = QVBoxLayout()
@@ -33,12 +34,38 @@ class AppWindow(QWidget):
 
     def init_ui(self):
         self.init_container()
+        self._add_header()
         self.add_video_input_section()
         self._add_output_section()
         self._add_button_section()
 
         self.status_bar = QStatusBar()
         self.layout["main"].addWidget(self.status_bar)
+
+    def _add_header(self):
+        header = QFrame()
+        header_layout = QHBoxLayout(header)
+        header.setObjectName("Header")
+
+        icon_label = QLabel()
+        pixmap = QPixmap(os.path.join("assets", "Icon_Header.png"))
+        icon_label.setPixmap(
+            pixmap.scaled(
+                50, 50, 
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        )
+
+        subtitle = QLabel("Diana's YouTube Transcript Downloader")
+        subtitle.setObjectName("HeaderSubtitle")
+
+        header_layout.addWidget(icon_label)
+        header_layout.addSpacing(8)
+        header_layout.addWidget(subtitle)
+        header_layout.addStretch()
+
+        self.layout["main"].addWidget(header)
 
     def add_video_input_section(self):
         self.layout["video_input"] = QHBoxLayout()
