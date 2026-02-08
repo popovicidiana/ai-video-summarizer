@@ -1,12 +1,12 @@
 import os
 from PyQt6.QtWidgets import (
     QWidget, QLineEdit, QPushButton, QLabel,
-    QStatusBar, QTextEdit, QVBoxLayout, QHBoxLayout
+    QStatusBar, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog
 )
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QPixmap, QTextDocument, QPageLayout, QPageSize
 from PyQt6.QtWidgets import QFrame
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QMarginsF
+from PyQt6.QtPrintSupport import QPrinter
 from app.utils import extract_video_id
 from app.youtube import fetch_transcript
 from app.summarizer import summarize_transcript
@@ -56,7 +56,6 @@ class AppWindow(QWidget):
                 Qt.TransformationMode.SmoothTransformation
             )
         )
-
         subtitle = QLabel("Diana's YouTube Transcript Downloader")
         subtitle.setObjectName("HeaderSubtitle")
 
@@ -106,6 +105,10 @@ class AppWindow(QWidget):
             self.button["summarize_transcript"]
         )
 
+        self.button["save_pdf"] = QPushButton("&Save as PDF")
+        self.button["save_pdf"].clicked.connect(self.save_as_pdf)
+        self.layout["transcript_download"].addWidget(self.button["save_pdf"])
+
         self.layout["transcript_download"].addStretch()
 
     def download_transcript(self):
@@ -132,7 +135,39 @@ class AppWindow(QWidget):
             self.status_bar.showMessage("Transcript is empty")
             return
 
-        self.status_bar.clearMessage()
+        self.status_bar.showMessage("Summarizing long transcript (this may take a moment)...")
+        # Call for the chunking logic
+        try:
+            html = summarize_transcript(self.client, transcript_text)
+            self.text_edit.setHtml(html)
+            self.status_bar.showMessage("Summary complete!")
+        except Exception as e:
+            self.status_bar.showMessage(f"Error during summary: {str(e)}")
 
-        html = summarize_transcript(self.client, transcript_text)
-        self.text_edit.setHtml(html)
+
+    def save_as_pdf(self):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Summary", "", "PDF Files (*.pdf)"
+        )
+
+        if not file_path:
+            return
+
+        if not file_path.endswith(".pdf"):
+            file_path += ".pdf"
+
+        printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+        printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+        printer.setOutputFileName(file_path)
+        # Set a normal page size
+        printer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
+
+        # Also added reasonable margins
+        printer.setPageMargins(QMarginsF(15, 15, 15, 15))
+        font = self.text_edit.font()
+        font.setPointSize(12)
+        self.text_edit.setFont(font)
+        # Print the QTextEdit content directly
+        self.text_edit.document().print(printer)
+
+        self.status_bar.showMessage(f"Successfully exported PDF: {file_path}")   

@@ -24,6 +24,7 @@ QLabel {
 QLineEdit,
 QTextEdit {
     background-color: #25252a;
+    line-height: 1.5;
     border: 1px solid #3a3a42;
     border-radius: 6px;
     padding: 8px;
@@ -34,6 +35,14 @@ QLineEdit:focus,
 QTextEdit:focus {
     border: 1px solid #6c9cff;
     background-color: #2a2a30;
+}
+
+QTextEdit b, QTextEdit strong {
+    color: #6c9cff;
+}
+
+QTextEdit li {
+    margin-bottom: 5px;
 }
 
 QPushButton {

@@ -1,0 +1,4 @@
+PyQt6
+youtube-transcript-api
+groq
+python-dotenv
