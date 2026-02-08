@@ -5,6 +5,7 @@ A simple desktop application built with **Python** and **PyQt6** that allows you
 - Download **YouTube video transcripts**
 - Summarize those transcripts
 - View everything in a clean GUI
+- Save in PDF format
 
 This personal project is currently in **early development** and will be extended with more features, tests, and UI improvements.
 
